@@ -145,28 +145,47 @@ a:focus-visible, button:focus-visible, summary:focus-visible { outline: 2px soli
 .tracker-item { display: none; }
 .tracker-item.active { display: block; color: #fff3e4; font: 500 11px/1.2 var(--sans); }
 @media (max-width: 640px) {
-  :root { --header-height: 65px; --edge: 21px; }
-  .brand { gap: 9px; }
-  .brand-symbol { width: 30px; height: 34px; }
-  .brand-name { font-size: 26px; }
-  .brand-trade { font-size: 7px; }
+  :root { --header-height: 65px; --edge: 20px; }
+  .brand { gap: 8px; }
+  .brand-symbol { width: 28px; height: 32px; }
+  .brand-name { font-size: 24px; }
+  .brand-trade { font-size: 7px; letter-spacing: .28em; }
   .header-actions { gap: 8px; }
-  .nav-cta { padding: 9px 11px; font-size: 10px; gap: 9px; }
-  .site-header { padding-right: 12px; }
+  .nav-cta { padding: 8px 12px; font-size: 10px; gap: 8px; }
+  .site-header { padding-right: 14px; padding-left: 16px; }
   #canvas-sticky-wrapper::after {
-    background: linear-gradient(to top, #070b11ed, #080c13ae 22%, #080c135c 43%, transparent 63%);
+    background: linear-gradient(to top, rgba(7, 11, 17, 0.92) 0%, rgba(8, 12, 19, 0.65) 30%, rgba(8, 12, 19, 0.25) 55%, transparent 75%);
   }
-  /* Em telas estreitas o script só anima o eixo Y em pixels. */
-  .chapter-card { width: calc(100% - 32px); top: 69%; translate: 0 -50%; transform: none; }
-  .chapter-card h1, .chapter-card h2 { font-size: clamp(42px, 11.8vw, 63px); }
-  .chapter-card em { display: block; }
-  .chapter-card p { max-width: 38ch; margin-top: 12px; font-size: 13px; }
-  .chapter-label { margin-bottom: 11px; font-size: 9px; }
-  .tour-actions { margin-top: 14px; gap: 15px; }
-  .tour-button { min-height: 40px; gap: 12px; padding: 10px 14px; }
+  /* Em telas touch o card fica ergonomicamente localizado acima da barra de navegação/polegar */
+  .chapter-card {
+    width: calc(100% - 32px);
+    top: auto;
+    bottom: max(68px, calc(env(safe-area-inset-bottom, 0px) + 54px));
+    transform: none;
+    padding-inline: 4px;
+  }
+  .chapter-card h1, .chapter-card h2 {
+    font-size: clamp(38px, 10.5vw, 56px);
+    line-height: 0.95;
+    letter-spacing: -0.02em;
+  }
+  .chapter-card em { display: inline; color: #ffedcf; }
+  .chapter-card p {
+    max-width: 34ch;
+    margin-top: 10px;
+    font-size: 13px;
+    line-height: 1.45;
+    color: rgba(255, 252, 246, 0.92);
+  }
+  .chapter-label { margin-bottom: 8px; font-size: 9px; letter-spacing: 0.2em; }
+  .tour-actions { margin-top: 14px; gap: 12px; }
+  .tour-button { min-height: 42px; gap: 10px; padding: 10px 16px; font-size: 12px; }
   .tour-cue { font-size: 11px; }
-  .tour-console { bottom: max(25px, env(safe-area-inset-bottom)); }
-  .tour-index { gap: 10px; }
+  .tour-console {
+    bottom: max(16px, env(safe-area-inset-bottom, 12px));
+    left: 16px;
+  }
+  .tour-index { gap: 8px; }
 }
 @media (max-height: 580px) {
   :root { --header-height: 54px; }

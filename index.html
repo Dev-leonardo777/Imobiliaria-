@@ -2,9 +2,10 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
   <title>ATELIER IMÓVEIS — Residências de Alto Padrão</title>
   <meta name="description" content="Apartamentos e imóveis cuidadosamente selecionados para quem valoriza localização, arquitetura e a sensação de estar no lugar certo.">
+  <meta name="theme-color" content="#101714">
 
   <!-- Open Graph -->
   <meta property="og:title" content="ATELIER IMÓVEIS — Residências de Alto Padrão">
@@ -30,12 +31,16 @@
       top: 0;
       left: 0;
       width: 100vw;
+      width: 100dvw;
       height: 100vh;
+      height: 100dvh;
       overflow: hidden;
       display: flex;
       align-items: center;
       justify-content: center;
       background: #000;
+      touch-action: pan-y;
+      will-change: transform;
     }
 
     /* Overlay escuro elegante e pontual */
@@ -62,10 +67,12 @@
       height: 100%;
       object-fit: cover;
       z-index: 1;
+      transform: translateZ(0);
+      backface-visibility: hidden;
     }
     @media (max-width: 640px) {
       #hero-cinematic-section {
-        height: 550vh; /* Otimizado para rolagem mobile mais confortável */
+        height: 480vh; /* Otimizado para rolagem ágil e fluida em smartphones */
       }
     }
   </style>
@@ -277,20 +284,25 @@
     const images = new Array(TOTAL_FRAMES);
     const loaded = new Array(TOTAL_FRAMES).fill(false);
 
-    // Detecção de modo de performance (Mobile / Baixo consumo de memória)
-    const isMobile = window.innerWidth <= 768;
-    const PRELOAD_BEHIND = isMobile ? 3 : 8;
-    const PRELOAD_AHEAD = isMobile ? 6 : 15;
+    // Detecção de modo de performance (Mobile / Baixo consumo de memória e bateria)
+    const isMobile = window.innerWidth <= 768 || ('ontouchstart' in window);
+    const PRELOAD_BEHIND = isMobile ? 4 : 8;
+    const PRELOAD_AHEAD = isMobile ? 10 : 16;
 
     function resizeCanvas() {
-      const dpr = Math.min(window.devicePixelRatio || 1, 2); // Limita DPR a 2 para eficiência térmica/mobile
-      canvas.width = window.innerWidth * dpr;
-      canvas.height = window.innerHeight * dpr;
+      // Em mobile, dpr = 1.0 a 1.5 é o sweet spot perfeito para 60fps sem consumo excessivo de memória/bateria
+      const maxDpr = isMobile ? (window.innerWidth <= 480 ? 1.25 : 1.5) : 2.0;
+      const dpr = Math.min(window.devicePixelRatio || 1, maxDpr);
+      canvas.width = Math.round(window.innerWidth * dpr);
+      canvas.height = Math.round(window.innerHeight * dpr);
       ctx.imageSmoothingEnabled = true;
-      ctx.imageSmoothingQuality = 'high';
+      ctx.imageSmoothingQuality = isMobile ? 'medium' : 'high';
       renderFrame(Math.round(currentFrameProgress));
     }
-    window.addEventListener('resize', resizeCanvas);
+    window.addEventListener('resize', resizeCanvas, { passive: true });
+    window.addEventListener('orientationchange', () => {
+      setTimeout(resizeCanvas, 100);
+    }, { passive: true });
 
     function loadFrame(index) {
       if (index < 0 || index >= TOTAL_FRAMES) return;
@@ -407,7 +419,18 @@
     const mainHeader = document.getElementById('main-header');
     const heroStoryLayer = document.getElementById('hero-story-layer');
 
+    let ticking = false;
     function onScroll() {
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          updateScrollLogic();
+          ticking = false;
+        });
+        ticking = true;
+      }
+    }
+
+    function updateScrollLogic() {
       const scrollY = window.pageYOffset || document.documentElement.scrollTop;
       const heroRect = heroSection.getBoundingClientRect();
       const heroTop = scrollY + heroRect.top;
@@ -535,7 +558,9 @@
 
     function tick() {
       const diff = targetProgress - currentFrameProgress;
-      currentFrameProgress += diff * 0.12;
+      // Coeficiente LERP ligeiramente mais ágil no mobile para acompanhar o swipe touch com precisão
+      const lerpSpeed = isMobile ? 0.16 : 0.12;
+      currentFrameProgress += diff * lerpSpeed;
 
       renderFrame(Math.round(currentFrameProgress));
       requestAnimationFrame(tick);
